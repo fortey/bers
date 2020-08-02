@@ -19,11 +19,20 @@ export class Cell extends Phaser.GameObjects.Container {
 
     setCard(card) {
         if (this.card) {
-            this.remove(this.card);
+            this.card.destroy();
         }
         this.card = card;
-        if (card)
-            this.add(card);
+        if (card) {
+            card.x = this.x;
+            card.y = this.y;
+        }
+    }
 
+    setAvailable() {
+        this.isAvailable = true;
+        const g = this.scene.add.graphics();
+        g.fillStyle(0xffffff, 0.3);
+        g.fillRect(-75, -75, 150, 150);
+        this.add(g);
     }
 }

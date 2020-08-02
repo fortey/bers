@@ -8,12 +8,12 @@ module.exports = [
 
     },
     {
-        id: 'test2',
-        name: 'test2',
+        id: 'Starter',
+        name: 'Starter',
         cards: [
-            { key: 'voin', count: 2 },
-            { key: 'volk', count: 2 },
-            { key: 'kshar', count: 2 }
+            { key: 'voin', count: 10 },
+            { key: 'volk', count: 10 },
+            { key: 'kshar', count: 10 }
         ]
     },
 ]

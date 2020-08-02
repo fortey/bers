@@ -5,7 +5,9 @@ export class Card extends Phaser.GameObjects.Container {
         this.height = 152;
         this.width = 152;
 
-        this.add(scene.add.sprite(0, 0, 'm-cards', cardData.frame));
+        this.sprite = scene.add.sprite(0, 0, 'm-cards', cardData.frame);
+        this.add(this.sprite);
+        this.key = cardData.key;
     }
 
     setOwner(owner) {
@@ -20,5 +22,10 @@ export class Card extends Phaser.GameObjects.Container {
         if (count > 1) {
             this.add(this.scene.add.text(55, -75, count, { color: 'blue', fontSize: 30, fontStyle: 'bold', strokeThickness: 2 }));
         }
+    }
+
+    setDraggable() {
+        this.setInteractive();
+        this.scene.input.setDraggable(this);
     }
 }
