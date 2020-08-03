@@ -7,10 +7,12 @@ module.exports = class Battle {
     constructor() {
         this.id = shortid.generate();
         this.state = 'selectDeck';
+        this.firstPlayer = null;
         this.players = [];
         this.postmans = [];
         this.decks = [];
         this.hands = [];
+        this.cardsID = [];
         this.board = [
             [null, null, 'e', null, null],
             [null, 'b', null, null, null],
@@ -61,6 +63,7 @@ module.exports = class Battle {
                 card.owner = playerID;
                 deck.push(card.id);
                 this.cards[card.id] = card;
+                this.cardsID.push(card.id);
             }
         });
         return deck;
@@ -74,26 +77,31 @@ module.exports = class Battle {
         }
     }
 
-    completeDrawing({ board }, playlerID) {
+    completeDrawing({ halfOfBoard }, playerID) {
         if (this.state == 'drawing') {// todo: проверка расстановки
-            if (this.firstPlayer === playlerID) {
+            console.log(`${this.firstPlayer} - ${playerID}`);
+            if (this.firstPlayer === playerID) {
                 for (let row = 0; row < 3; row++) {
                     for (let col = 0; col < 5; col++) {
-                        this.board[row + 3][col] = board[row][col];
+                        this.board[row + 3][col] = halfOfBoard[row][col];
                     }
                 }
             } else {
                 for (let row = 0; row < 3; row++) {
                     for (let col = 0; col < 5; col++) {
-                        this.board[2 - 1 * row][4 - 1 * col] = board[row][col]; // переворачивается поле 2го игрока
+                        this.board[2 - 1 * row][4 - 1 * col] = halfOfBoard[row][col]; // переворачивается поле 2го игрока
                     }
                 }
             }
         }
+
+        this.state = 'startBattle';
+        const cards = this.cardsID.map((cardID, ind, arr) => ({ id: cardID, key: this.cards[cardID].key, owner: this.cards[cardID].owner }));
+        this.postmans[playerID]({ action: 'startBattle', board: this.board, cards: cards });
     }
 
     setFirstPlayer() {
         if (!this.firstPlayer)
-            this.firstPlayer = players[0];
+            this.firstPlayer = this.players[0];
     }
 }

@@ -25,6 +25,7 @@ export class Cell extends Phaser.GameObjects.Container {
         if (card) {
             card.x = this.x;
             card.y = this.y;
+            card.setVisible(true);
         }
     }
 

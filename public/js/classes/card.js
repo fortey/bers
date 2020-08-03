@@ -8,11 +8,12 @@ export class Card extends Phaser.GameObjects.Container {
         this.sprite = scene.add.sprite(0, 0, 'm-cards', cardData.frame);
         this.add(this.sprite);
         this.key = cardData.key;
+        this.setVisible(false);
     }
 
     setOwner(owner) {
         this.owner = owner;
-        const color = this.scene.playerIndex === owner ? 0x0000ff : 0xff0000f;
+        const color = this.scene.playerID === owner ? 0x0000ff : 0xff0000f;
         const graphics = this.scene.add.graphics();
         graphics.lineStyle(2, color);
         graphics.strokeRect(-76, -76, 152, 152);

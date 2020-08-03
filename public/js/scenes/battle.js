@@ -12,18 +12,21 @@ export class BattleScene extends Phaser.Scene {
 
     }
 
-    init(data) {
-        console.log(data);
-        this.id = data.id;
-        this.state = data.state;
+    init({ id, state, playerID, decks }) {
+        this.id = id;
+        this.state = state;
+        this.playerID = playerID;
         // this.players = data.players;
         // this.boardData = data.board;
         // this.cardsData = data.cards;
-        // this.cards = [];
+        this.cards = [];
         // this.playerIndex = this.players.indexOf(data.playerID);
         // this.action = null;
-        this.decks = data.decks;
+        this.decks = decks;
         this.firstTurn = true;
+        this.commands = [];
+        this.commands['startDrawing'] = this.startDrawing.bind(this);
+        this.commands['startBattle'] = this.startBattle.bind(this);
     }
     preload() { }
 
@@ -36,8 +39,8 @@ export class BattleScene extends Phaser.Scene {
         this.nextButton.visible = false;
     }
 
-    initCards() {
-        this.cardsData.forEach(cardData => {
+    initCards(cardsData) {
+        cardsData.forEach(cardData => {
             const card = new Card(this, cardStore[cardData.key]);
             card.setOwner(cardData.owner);
             this.cards[cardData.id] = card;
@@ -109,8 +112,10 @@ export class BattleScene extends Phaser.Scene {
     battleOn(data) {
         console.log('battle on');
         console.log(data);
-        if (data.action == 'startDrawing') {
-            this.startDrawing(data.hand);
+
+        const command = this.commands[data.action];
+        if (command) {
+            command(data);
         }
     }
     battleEmit(data) {
@@ -133,7 +138,7 @@ export class BattleScene extends Phaser.Scene {
         }
     }
 
-    startDrawing(hand) {
+    startDrawing({ hand }) {
         this.deckList.forEach(el => el.destroy());
         this.board.forEach(row => row.forEach(cell => {
             if (cell.card) {
@@ -223,6 +228,37 @@ export class BattleScene extends Phaser.Scene {
     completeDrawing() {
         const halfOfBoard = this.bottomBoard.map((row, indexRow, rows) => row.map((cell, index, row) => cell.card?.id ?? null));
         this.battleEmit({ action: 'completeDrawing', halfOfBoard: halfOfBoard })
+    }
+
+    startBattle({ board, cards }) {
+        this.hand.forEach(row => row.forEach(cell => {
+            if (cell.card) {
+                cell.card.destroy();
+                cell.card = null;
+            }
+            cell.destroy();
+        }));
+        this.bottomBoard.forEach(row => row.forEach(cell => {
+            if (cell.card) {
+                cell.card.destroy();
+                cell.card = null;
+            }
+            cell.destroy();
+        }));
+        this.nextButton.destroy();
+
+        this.initCards(cards);
+
+        for (let row = 0; row < 6; row++) {
+            for (let col = 0; col < 5; col++) {
+                this.board[row][col].setVisible(true);
+                const cardID = board[row][col];
+                if (cardID) {
+                    this.board[row][col].setCard(this.cards[cardID]);
+                }
+                this.board[row][col].on('pointerdown', () => this.cellPointerDown(row, col));
+            }
+        }
     }
 }
 
