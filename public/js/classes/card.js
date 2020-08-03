@@ -29,4 +29,8 @@ export class Card extends Phaser.GameObjects.Container {
         this.setInteractive();
         this.scene.input.setDraggable(this);
     }
+
+    canMove() {
+        return true;
+    }
 }

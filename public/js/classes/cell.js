@@ -13,8 +13,20 @@ export class Cell extends Phaser.GameObjects.Container {
     }
 
     setPaw() {
-        const paw = this.scene.add.sprite(0, 0, 'paw');
-        this.add(paw);
+        if (!this.card) {
+            const paw = this.scene.add.sprite(0, 0, 'paw');
+            this.add(paw);
+            this.paw = paw;
+            return true;
+        }
+        return false;
+    }
+
+    deletePaw() {
+        if (this.paw) {
+            this.paw.destroy();
+            this.paw = null;
+        }
     }
 
     setCard(card) {
@@ -26,6 +38,7 @@ export class Cell extends Phaser.GameObjects.Container {
             card.x = this.x;
             card.y = this.y;
             card.setVisible(true);
+            card.cell = this;
         }
     }
 

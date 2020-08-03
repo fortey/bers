@@ -23,6 +23,7 @@ export class BattleScene extends Phaser.Scene {
         // this.playerIndex = this.players.indexOf(data.playerID);
         // this.action = null;
         this.decks = decks;
+        this.paws = [];
         this.firstTurn = true;
         this.commands = [];
         this.commands['startDrawing'] = this.startDrawing.bind(this);
@@ -43,25 +44,10 @@ export class BattleScene extends Phaser.Scene {
         cardsData.forEach(cardData => {
             const card = new Card(this, cardStore[cardData.key]);
             card.setOwner(cardData.owner);
+            card.id = cardData.id;
             this.cards[cardData.id] = card;
         });
     }
-    // drawBoard(board) {
-
-    //     for (let row = 0; row < 6; row++) {
-    //         this.board[row] = [];
-    //         for (let col = 0; col < 5; col++) {
-    //             const cell = new Cell(this, col, row);
-    //             this.board[row][col] = cell;
-    //             const cardId = board[row][col];
-    //             if (cardId) {
-    //                 cell.setCard(this.cards[cardId]);
-    //                 //cell.card = this.cards[cardId];
-    //             }
-    //             cell.on('pointerdown', () => this.cellPointerDown(row, col));
-    //         }
-    //     }
-    // }
 
     drawBoard() {
         this.board = [];
@@ -75,16 +61,54 @@ export class BattleScene extends Phaser.Scene {
     }
 
     cellPointerDown(row, col) {
-        console.log(`cellPointerDown: ${row} - ${col}`);
-        if (!this.action) {
-            this.action = 'selectCard';
-            this.showPaws(row, col);
+        //console.log(`cellPointerDown: ${row} - ${col}`);
+        if (!this.action || this.action == 'selectCard') {
+            const card = this.board[row][col].card;
+            if (card) {
+                if (this.selectdCard) {
+                    if (this.selectdCard == card) return;
+                    this.deletePaws();
+                }
+                this.action = 'selectCard';
+                this.selectdCard = card;
+                if (this.selectdCard.canMove())
+                    this.showPaws(row, col);
+
+            } else if (this.action == 'selectCard') {
+                if (this.paws.indexOf(this.board[row][col]) != -1) {
+                    this.battleEmit({ action: 'moveCard', card: this.selectdCard.id, row: row, col: col });
+                    console.log({ action: 'moveCard', card: this.selectdCard.id, row: row, col: col });
+                }
+                else {
+                    this.deletePaws();
+                    this.action = null;
+                    this.selectdCard = null;
+                }
+            }
         }
     }
+
     showPaws(row, col) {
         if (row > 0) {
-            this.board[row - 1][col].setPaw();
-        }
+            if (this.board[row - 1][col].setPaw())
+                this.paws.push(this.board[row - 1][col]);
+        };
+        if (row < 5) {
+            if (this.board[row + 1][col].setPaw())
+                this.paws.push(this.board[row + 1][col]);
+        };
+        if (col > 0) {
+            if (this.board[row][col - 1].setPaw())
+                this.paws.push(this.board[row][col - 1]);
+        };
+        if (col < 4) {
+            if (this.board[row][col + 1].setPaw())
+                this.paws.push(this.board[row][col + 1]);
+        };
+    }
+    deletePaws() {
+        this.paws.forEach(cell => cell.deletePaw());
+        this.paws = [];
     }
 
     createDeckList() {
@@ -200,7 +224,6 @@ export class BattleScene extends Phaser.Scene {
         this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
             gameObject.x = dragX;
             gameObject.y = dragY;
-
         });
         this.input.on('dragend', (pointer, gameObject) => {
             gameObject.depth = 1;
@@ -211,6 +234,7 @@ export class BattleScene extends Phaser.Scene {
                 const row = Math.trunc(y / 155);
                 const cell = this.bottomBoard[row][col];
                 if (cell && cell.isAvailable && !cell.card) {
+                    gameObject.cell.card = null;
                     cell.setCard(gameObject);
                 }
                 else {
