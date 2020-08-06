@@ -28,6 +28,7 @@ export class BattleScene extends Phaser.Scene {
         this.commands = [];
         this.commands['startDrawing'] = this.startDrawing.bind(this);
         this.commands['startBattle'] = this.startBattle.bind(this);
+        this.commands['moveCardComplete'] = this.moveCardComplete.bind(this);
     }
     preload() { }
 
@@ -283,6 +284,15 @@ export class BattleScene extends Phaser.Scene {
                 this.board[row][col].on('pointerdown', () => this.cellPointerDown(row, col));
             }
         }
+    }
+
+    moveCardComplete({ card, row, col, oldPos }) {
+        this.board[oldPos.y][oldPos.x].card = null;
+        this.board[row][col].setCard(this.cards[card]);
+        this.cards[card].paws--;
+        this.deletePaws();
+        this.selectdCard = null;
+        this.cellPointerDown(row, col);
     }
 }
 

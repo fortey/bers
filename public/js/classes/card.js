@@ -7,7 +7,10 @@ export class Card extends Phaser.GameObjects.Container {
 
         this.sprite = scene.add.sprite(0, 0, 'm-cards', cardData.frame);
         this.add(this.sprite);
-        this.key = cardData.key;
+        for (let key in cardData) {
+            this[key] = cardData[key];
+        }
+        this.isOpen = true;
         this.setVisible(false);
     }
 
@@ -31,6 +34,6 @@ export class Card extends Phaser.GameObjects.Container {
     }
 
     canMove() {
-        return true;
+        return this.isOpen && this.paws > 0;
     }
 }

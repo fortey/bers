@@ -14,8 +14,8 @@ module.exports = class Battle {
         this.hands = [];
         this.cardsID = [];
         this.board = [
-            [null, null, 'e', null, null],
-            [null, 'b', null, null, null],
+            [null, null, null, null, null],
+            [null, null, null, null, null],
             [null, null, null, null, null],
             [null, null, null, null, null],
             [null, null, null, null, null],
@@ -25,6 +25,7 @@ module.exports = class Battle {
         this.commands = [];
         this.commands['selectDeck'] = this.startDrawing.bind(this);
         this.commands['completeDrawing'] = this.completeDrawing.bind(this);
+        this.commands['moveCard'] = this.moveCard.bind(this);
     }
 
     messageOn(message, playerID) {
@@ -103,5 +104,26 @@ module.exports = class Battle {
     setFirstPlayer() {
         if (!this.firstPlayer)
             this.firstPlayer = this.players[0];
+    }
+
+    moveCard({ card, row, col }, playerID) {
+        const cardOb = this.cards[card];
+        if (!cardOb || cardOb.owner != playerID || cardOb.paws == 0) return;
+        let pos = this.cardPosition(card);
+        if (pos && !this.board[row][col] && (Math.abs(pos.x - col) == 1 && pos.y == row || Math.abs(pos.y - row) == 1 && pos.x == col)) {
+            this.board[pos.y][pos.x] = null;
+            this.board[row][col] = card;
+            cardOb.paws--;
+            this.players.forEach(player => this.postmans[player]({ action: 'moveCardComplete', card, row, col, oldPos: pos }));
+        }
+    }
+
+    cardPosition(cardID) {
+        for (let row = 0; row < 6; row++) {
+            for (let col = 0; col < 5; col++) {
+                if (this.board[row][col] == cardID)
+                    return { y: row, x: col };
+            }
+        }
     }
 }

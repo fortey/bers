@@ -58,7 +58,7 @@ app.use((err, req, res, next) => {
     res.status(err.status || 500).json({ error: err.message });
 });
 
-server.listen(process.env.PORT || 33004, () => {
+server.listen(process.env.PORT || 33000, () => {
     console.log(`Server started on port ${process.env.PORT || 33000}`);
 });
 
