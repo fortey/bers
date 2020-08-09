@@ -21,6 +21,7 @@ module.exports = class Battle {
             [null, null, null, null, null],
             [null, null, null, null, null]];
         this.cards = [];
+        this.enterCallbacks = [];
 
         this.commands = [];
         this.commands['selectDeck'] = this.startDrawing.bind(this);
@@ -33,6 +34,18 @@ module.exports = class Battle {
         if (command) {
             command(message, playerID);
         }
+    }
+
+    addPlayer(playerID, playerPostman) {
+        this.players.push(playerID);
+        this.postmans[playerID] = playerPostman; //console.log('addpla',)
+        if (this.players.length == 1) this.start();// later 2
+    }
+
+    start() {
+        this.startTime = Date.now();
+        this.selectDeckTime = 120;
+        this.enterCallbacks.forEach(callback => callback({ id: this.id, decks: testDecks, endTime: this.startTime + this.selectDeckTime * 1000 }));
     }
 
     startDrawing({ deckID }, playerID) {
@@ -95,7 +108,7 @@ module.exports = class Battle {
                 }
             }
         }
-
+        this.addTestPlayer();
         this.state = 'startBattle';
         const cards = this.cardsID.map((cardID, ind, arr) => ({ id: cardID, key: this.cards[cardID].key, owner: this.cards[cardID].owner }));
         this.postmans[playerID]({ action: 'startBattle', board: this.board, cards: cards });
@@ -125,5 +138,13 @@ module.exports = class Battle {
                     return { y: row, x: col };
             }
         }
+    }
+
+    addTestPlayer() {
+        const playerID = 'test';
+        this.addPlayer(playerID, (data) => { });
+        const deck = testDecks.find(el => el.id == 'Starter');
+        this.decks[playerID] = this.initDeck(deck.cards, playerID);
+        this.board[2][2] = this.decks[playerID][0];
     }
 }

@@ -2,6 +2,7 @@ import { Cell } from '../classes/cell.js';
 import { cardStore } from '../cardStore.js';
 import { Card } from '../classes/card.js';
 import { DeckItem } from '../classes/deckItem.js';
+import { Abilities } from '../classes/abilities.js';
 
 export class BattleScene extends Phaser.Scene {
     constructor() {
@@ -12,10 +13,11 @@ export class BattleScene extends Phaser.Scene {
 
     }
 
-    init({ id, state, playerID, decks }) {
+    init({ id, state, playerID, decks, endTime }) {
         this.id = id;
         this.state = state;
         this.playerID = playerID;
+        this.endTime = endTime;
         // this.players = data.players;
         // this.boardData = data.board;
         // this.cardsData = data.cards;
@@ -28,7 +30,7 @@ export class BattleScene extends Phaser.Scene {
         this.commands = [];
         this.commands['startDrawing'] = this.startDrawing.bind(this);
         this.commands['startBattle'] = this.startBattle.bind(this);
-        this.commands['moveCardComplete'] = this.moveCardComplete.bind(this);
+        this.commands['moveCardComplete'] = this.moveCardComplete.bind(this); console.log(Abilities.get('SimplePunch'));
     }
     preload() { }
 
@@ -39,8 +41,12 @@ export class BattleScene extends Phaser.Scene {
         this.drawBoard();
         this.nextButton = this.add.text(1200, 500, 'Далее', { color: 'white', fontSize: 30, fontStyle: 'bold', backgroundColor: 'grey' });
         this.nextButton.visible = false;
+        this.timer = this.add.text(1200, 100);
     }
 
+    update() {
+        this.timer.setText((this.endTime - Date.now()).toString().substr(0, 3));
+    }
     initCards(cardsData) {
         cardsData.forEach(cardData => {
             const card = new Card(this, cardStore[cardData.key]);

@@ -23,9 +23,8 @@ io.on('connection', function (socket) {
     socket.on('createBattle', () => {
         const battle = new Battle();
         battles[playerID] = battle;
-        battle.players.push(playerID);
-        battle.postmans[playerID] = (data) => socket.emit('battleServer', data);
-        socket.emit('enterBattle', { id: battle.id, decks: testDecks });
+        battle.enterCallbacks.push((data) => socket.emit('enterBattle', data));
+        battle.addPlayer(playerID, (data) => socket.emit('battleServer', data));
     });
 
     socket.on('battleClient', (data) => {
