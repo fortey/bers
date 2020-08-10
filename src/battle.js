@@ -2,6 +2,7 @@ const shortid = require('shortid');
 
 const testDecks = require('./testDecks.js');
 const Card = require('./card.js');
+const Point = require('./point.js');
 
 module.exports = class Battle {
     constructor() {
@@ -38,7 +39,7 @@ module.exports = class Battle {
 
     addPlayer(playerID, playerPostman) {
         this.players.push(playerID);
-        this.postmans[playerID] = playerPostman; //console.log('addpla',)
+        this.postmans[playerID] = playerPostman;
         if (this.players.length == 1) this.start();// later 2
     }
 
@@ -108,9 +109,15 @@ module.exports = class Battle {
                 }
             }
         }
+
+        for (let row = 0; row < 6; row++) {
+            for (let col = 0; col < 5; col++) {
+                this.cards[this.board[row][col]].pos = new Point(col, row);
+            }
+        }
         this.addTestPlayer();
         this.state = 'startBattle';
-        const cards = this.cardsID.map((cardID, ind, arr) => ({ id: cardID, key: this.cards[cardID].key, owner: this.cards[cardID].owner }));
+        const cards = this.cardsID.map((cardID, ind, arr) => ({ id: cardID, key: this.cards[cardID].key, owner: this.cards[cardID].owner, pos: this.caards[cardID].pos }));
         this.postmans[playerID]({ action: 'startBattle', board: this.board, cards: cards });
     }
 

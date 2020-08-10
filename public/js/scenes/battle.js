@@ -2,7 +2,6 @@ import { Cell } from '../classes/cell.js';
 import { cardStore } from '../cardStore.js';
 import { Card } from '../classes/card.js';
 import { DeckItem } from '../classes/deckItem.js';
-import { Abilities } from '../classes/abilities.js';
 
 export class BattleScene extends Phaser.Scene {
     constructor() {
@@ -30,7 +29,7 @@ export class BattleScene extends Phaser.Scene {
         this.commands = [];
         this.commands['startDrawing'] = this.startDrawing.bind(this);
         this.commands['startBattle'] = this.startBattle.bind(this);
-        this.commands['moveCardComplete'] = this.moveCardComplete.bind(this); console.log(Abilities.get('SimplePunch'));
+        this.commands['moveCardComplete'] = this.moveCardComplete.bind(this); console.log(cardStore['arb'].abilities);
     }
     preload() { }
 

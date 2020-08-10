@@ -36,4 +36,8 @@ export class Card extends Phaser.GameObjects.Container {
     canMove() {
         return this.isOpen && this.paws > 0 && this.scene.playerID == this.owner;
     }
+
+    setTarget() {
+        this.sprite.setTint(0xffff00);
+    }
 }

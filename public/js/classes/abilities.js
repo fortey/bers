@@ -2,7 +2,7 @@ export class Ability {
 
 };
 
-class SimplePunch {
+export class SimplePunch {
     constructor(damage) {
         this.damage = damage;
     }
@@ -16,7 +16,3 @@ class SimplePunch {
         });
     }
 }
-
-export const Abilities = new Map([
-    ['SimplePunch', SimplePunch]
-]);

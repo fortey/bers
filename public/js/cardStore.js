@@ -1,7 +1,10 @@
+import * as Abilities from './classes/abilities.js';
+
 export const cardStore = {
     'arb': {
         key: 'arb', name: 'Арбалетчик', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 0
+        type: 'gold', health: 8, paws: 2, frame: 0,
+        abilities: [new Abilities.SimplePunch([1, 2, 3])]
     },
     'garrid': {
         key: 'garrid', name: 'Гаррид-лучник', cost: 6,
