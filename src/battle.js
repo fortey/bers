@@ -112,12 +112,13 @@ module.exports = class Battle {
 
         for (let row = 0; row < 6; row++) {
             for (let col = 0; col < 5; col++) {
-                this.cards[this.board[row][col]].pos = new Point(col, row);
+                if (this.board[row][col])
+                    this.cards[this.board[row][col]].pos = new Point(col, row);
             }
         }
         this.addTestPlayer();
         this.state = 'startBattle';
-        const cards = this.cardsID.map((cardID, ind, arr) => ({ id: cardID, key: this.cards[cardID].key, owner: this.cards[cardID].owner, pos: this.caards[cardID].pos }));
+        const cards = this.cardsID.map((cardID, ind, arr) => ({ id: cardID, key: this.cards[cardID].key, owner: this.cards[cardID].owner, pos: this.cards[cardID].pos }));
         this.postmans[playerID]({ action: 'startBattle', board: this.board, cards: cards });
     }
 

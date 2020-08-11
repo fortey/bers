@@ -35,7 +35,6 @@ export class BattleScene extends Phaser.Scene {
 
     create() {
         this.scene.get("Main").events.on("battleOn", this.battleOn, this);
-        //this.initCards();
         this.createDeckList();
         this.drawBoard();
         this.nextButton = this.add.text(1200, 500, 'Далее', { color: 'white', fontSize: 30, fontStyle: 'bold', backgroundColor: 'grey' });
@@ -79,6 +78,7 @@ export class BattleScene extends Phaser.Scene {
                 this.selectdCard = card;
                 if (this.selectdCard.canMove())
                     this.showPaws(row, col);
+                this.showCardActions(card);
 
             } else if (this.action == 'selectCard') {
                 if (this.paws.indexOf(this.board[row][col]) != -1) {
@@ -87,6 +87,7 @@ export class BattleScene extends Phaser.Scene {
                 }
                 else {
                     this.deletePaws();
+                    this.clearCardActions();
                     this.action = null;
                     this.selectdCard = null;
                 }
@@ -298,6 +299,22 @@ export class BattleScene extends Phaser.Scene {
         this.deletePaws();
         this.selectdCard = null;
         this.cellPointerDown(row, col);
+    }
+
+    showCardActions(card) {
+        this.clearCardActions();
+        this.cardActions = [];
+        card.abilities.forEach((ability, index, arr) => {
+            let action = this.add.text(1200, 900 - 50 * index, ability.toString(), { color: 'white', fontStyle: 'bold', backgroundColor: 'grey' });
+            action.setInteractive();
+            action.on('pointerdown', () => console.log(ability.toString()));
+            this.cardActions.push(action);
+        });
+    }
+    clearCardActions() {
+        if (this.cardActions) {
+            this.cardActions.forEach((action, index, arr) => action.destroy());
+        }
     }
 }
 
