@@ -50,67 +50,69 @@ export class BattleScene extends Phaser.Scene {
             const card = new Card(this, cardStore[cardData.key]);
             card.setOwner(cardData.owner);
             card.id = cardData.id;
+            if (cardData.pos)
+                card.setPos(cardData.pos);
             this.cards[cardData.id] = card;
         });
     }
 
     drawBoard() {
-        this.board = [];
+        this.cells = [];
         const startX = this.boardLeftX + 76;
         for (let row = 0; row < 6; row++) {
-            this.board[row] = [];
+            this.cells[row] = [];
             for (let col = 0; col < 5; col++) {
-                this.board[row][col] = new Cell(this, col * 155 + startX, row * 155 + 78);
+                this.cells[row][col] = new Cell(this, col * 155 + startX, row * 155 + 78);
             }
         }
     }
 
     cellPointerDown(row, col) {
-        //console.log(`cellPointerDown: ${row} - ${col}`);
-        if (!this.action || this.action == 'selectCard') {
-            const card = this.board[row][col].card;
-            if (card) {
-                if (this.selectdCard) {
-                    if (this.selectdCard == card) return;
-                    this.deletePaws();
-                }
-                this.action = 'selectCard';
-                this.selectdCard = card;
-                if (this.selectdCard.canMove())
-                    this.showPaws(row, col);
-                this.showCardActions(card);
-
-            } else if (this.action == 'selectCard') {
-                if (this.paws.indexOf(this.board[row][col]) != -1) {
-                    this.battleEmit({ action: 'moveCard', card: this.selectdCard.id, row: row, col: col });
-                    console.log({ action: 'moveCard', card: this.selectdCard.id, row: row, col: col });
-                }
-                else {
-                    this.deletePaws();
-                    this.clearCardActions();
-                    this.action = null;
-                    this.selectdCard = null;
-                }
+        console.log(`cellPointerDown: ${row} - ${col}`);
+        if (this.action == 'selectCard') {
+            if (this.paws.indexOf(this.cells[row][col]) != -1) {
+                this.battleEmit({ action: 'moveCard', card: this.selectdCard.id, row: row, col: col });
+                console.log({ action: 'moveCard', card: this.selectdCard.id, row: row, col: col });
             }
+            else {
+                this.deletePaws();
+                this.clearCardActions();
+                this.action = null;
+                this.selectdCard = null;
+            }
+        }
+    }
+
+    onCardClick(card) {
+        if (!this.action || this.action == 'selectCard') {
+            if (this.selectdCard) {
+                if (this.selectdCard == card) return;
+                this.deletePaws();
+            }
+            this.action = 'selectCard';
+            this.selectdCard = card;
+            if (this.selectdCard.canMove())
+                this.showPaws(card.pos.y, card.pos.x);
+            this.showCardActions(card);
         }
     }
 
     showPaws(row, col) {
         if (row > 0) {
-            if (this.board[row - 1][col].setPaw())
-                this.paws.push(this.board[row - 1][col]);
+            if (this.cells[row - 1][col].setPaw())
+                this.paws.push(this.cells[row - 1][col]);
         };
         if (row < 5) {
-            if (this.board[row + 1][col].setPaw())
-                this.paws.push(this.board[row + 1][col]);
+            if (this.cells[row + 1][col].setPaw())
+                this.paws.push(this.cells[row + 1][col]);
         };
         if (col > 0) {
-            if (this.board[row][col - 1].setPaw())
-                this.paws.push(this.board[row][col - 1]);
+            if (this.cells[row][col - 1].setPaw())
+                this.paws.push(this.cells[row][col - 1]);
         };
         if (col < 4) {
-            if (this.board[row][col + 1].setPaw())
-                this.paws.push(this.board[row][col + 1]);
+            if (this.cells[row][col + 1].setPaw())
+                this.paws.push(this.cells[row][col + 1]);
         };
     }
     deletePaws() {
@@ -158,10 +160,10 @@ export class BattleScene extends Phaser.Scene {
         for (let row = 0; row < 6; row++) {
             for (let col = 0; col < 5; col++) {
                 if (i >= cards.length)
-                    this.board[row][col].setCard(null);
+                    this.cells[row][col].setCard(null);
                 else {
                     const card = new Card(this, cardStore[cards[i].key]);
-                    this.board[row][col].setCard(card);
+                    this.cells[row][col].setCard(card);
                     card.setCounter(cards[i].count);
                 }
                 i++;
@@ -171,7 +173,7 @@ export class BattleScene extends Phaser.Scene {
 
     startDrawing({ hand }) {
         this.deckList.forEach(el => el.destroy());
-        this.board.forEach(row => row.forEach(cell => {
+        this.cells.forEach(row => row.forEach(cell => {
             if (cell.card) {
                 cell.card.destroy();
                 cell.card = null;
@@ -278,27 +280,29 @@ export class BattleScene extends Phaser.Scene {
         }));
         this.nextButton.destroy();
 
-        this.initCards(cards);
-
         for (let row = 0; row < 6; row++) {
             for (let col = 0; col < 5; col++) {
-                this.board[row][col].setVisible(true);
-                const cardID = board[row][col];
-                if (cardID) {
-                    this.board[row][col].setCard(this.cards[cardID]);
-                }
-                this.board[row][col].on('pointerdown', () => this.cellPointerDown(row, col));
+                this.cells[row][col].setVisible(true);
+                // const cardID = board[row][col];
+                // if (cardID) {
+                //     this.board[row][col].setCard(this.cards[cardID]);
+                // }
+                this.cells[row][col].on('pointerdown', () => this.cellPointerDown(row, col));
             }
         }
+
+        this.initCards(cards);
     }
 
-    moveCardComplete({ card, row, col, oldPos }) {
-        this.board[oldPos.y][oldPos.x].card = null;
-        this.board[row][col].setCard(this.cards[card]);
-        this.cards[card].paws--;
+    moveCardComplete({ cardID, pos, oldPos }) {
+        // this.cells[oldPos.y][oldPos.x].card = null;
+        // this.cells[row][col].setCard(this.cards[card]);
+        const card = this.cards[cardID];
+        card.paws--;
         this.deletePaws();
         this.selectdCard = null;
-        this.cellPointerDown(row, col);
+        card.setPos(pos);
+        this.onCardClick(card);
     }
 
     showCardActions(card) {

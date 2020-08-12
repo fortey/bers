@@ -14,13 +14,7 @@ module.exports = class Battle {
         this.decks = [];
         this.hands = [];
         this.cardsID = [];
-        this.board = [
-            [null, null, null, null, null],
-            [null, null, null, null, null],
-            [null, null, null, null, null],
-            [null, null, null, null, null],
-            [null, null, null, null, null],
-            [null, null, null, null, null]];
+        this.board = [];
         this.cards = [];
         this.enterCallbacks = [];
 
@@ -95,31 +89,34 @@ module.exports = class Battle {
     completeDrawing({ halfOfBoard }, playerID) {
         if (this.state == 'drawing') {// todo: проверка расстановки
             console.log(`${this.firstPlayer} - ${playerID}`);
-            if (this.firstPlayer === playerID) {
-                for (let row = 0; row < 3; row++) {
-                    for (let col = 0; col < 5; col++) {
-                        this.board[row + 3][col] = halfOfBoard[row][col];
-                    }
-                }
-            } else {
-                for (let row = 0; row < 3; row++) {
-                    for (let col = 0; col < 5; col++) {
-                        this.board[2 - 1 * row][4 - 1 * col] = halfOfBoard[row][col]; // переворачивается поле 2го игрока
-                    }
-                }
-            }
-        }
 
-        for (let row = 0; row < 6; row++) {
-            for (let col = 0; col < 5; col++) {
-                if (this.board[row][col])
-                    this.cards[this.board[row][col]].pos = new Point(col, row);
+            for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 5; col++) {
+                    const cardID = halfOfBoard[row][col];
+                    if (cardID && this.cards[cardID]) {
+                        if (this.firstPlayer === playerID) {
+                            //this.board[row + 3][col] = halfOfBoard[row][col];
+                            this.cards[cardID].pos = new Point(col, row + 3);
+                        } else {
+                            //this.board[2 - 1 * row][4 - 1 * col] = halfOfBoard[row][col]; // переворачивается поле 2го игрока
+                            this.cards[cardID].pos = new Point(4 - 1 * col, 2 - 1 * row);
+                        }
+                        this.board.push(cardID);
+                    }
+                }
             }
+
+            // for (let row = 0; row < 6; row++) {
+            //     for (let col = 0; col < 5; col++) {
+            //         if (this.board[row][col])
+            //             this.cards[this.board[row][col]].pos = new Point(col, row);
+            //     }
+            // }
+            this.addTestPlayer();
+            this.state = 'startBattle';
+            const cards = this.cardsID.map((cardID, ind, arr) => ({ id: cardID, key: this.cards[cardID].key, owner: this.cards[cardID].owner, pos: this.cards[cardID].pos }));
+            this.postmans[playerID]({ action: 'startBattle', board: this.board, cards: cards });
         }
-        this.addTestPlayer();
-        this.state = 'startBattle';
-        const cards = this.cardsID.map((cardID, ind, arr) => ({ id: cardID, key: this.cards[cardID].key, owner: this.cards[cardID].owner, pos: this.cards[cardID].pos }));
-        this.postmans[playerID]({ action: 'startBattle', board: this.board, cards: cards });
     }
 
     setFirstPlayer() {
@@ -130,29 +127,32 @@ module.exports = class Battle {
     moveCard({ card, row, col }, playerID) {
         const cardOb = this.cards[card];
         if (!cardOb || cardOb.owner != playerID || cardOb.paws == 0) return;
-        let pos = this.cardPosition(card);
-        if (pos && !this.board[row][col] && (Math.abs(pos.x - col) == 1 && pos.y == row || Math.abs(pos.y - row) == 1 && pos.x == col)) {
-            this.board[pos.y][pos.x] = null;
-            this.board[row][col] = card;
+        const pos = cardOb.pos;
+        if (pos && this.cardInPosition(row, col) === undefined && (Math.abs(pos.x - col) == 1 && pos.y == row || Math.abs(pos.y - row) == 1 && pos.x == col)) {
+            cardOb.pos = new Point(col, row);
             cardOb.paws--;
-            this.players.forEach(player => this.postmans[player]({ action: 'moveCardComplete', card, row, col, oldPos: pos }));
+            this.players.forEach(player => this.postmans[player]({ action: 'moveCardComplete', cardID: card, pos: cardOb.pos, oldPos: pos }));
         }
     }
 
-    cardPosition(cardID) {
-        for (let row = 0; row < 6; row++) {
-            for (let col = 0; col < 5; col++) {
-                if (this.board[row][col] == cardID)
-                    return { y: row, x: col };
-            }
-        }
+    cardInPosition(row, col) {
+        return this.board.find((card, ind, arr) => this.cards[card].pos.x == col && this.cards[card].pos.y == row);
     }
+    // cardPosition(cardID) {
+    //     for (let row = 0; row < 6; row++) {
+    //         for (let col = 0; col < 5; col++) {
+    //             if (this.board[row][col] == cardID)
+    //                 return { y: row, x: col };
+    //         }
+    //     }
+    // }
 
     addTestPlayer() {
         const playerID = 'test';
         this.addPlayer(playerID, (data) => { });
         const deck = testDecks.find(el => el.id == 'Starter');
         this.decks[playerID] = this.initDeck(deck.cards, playerID);
-        this.board[2][2] = this.decks[playerID][0];
+        this.board.push(this.decks[playerID][0]);
+        this.cards[this.decks[playerID][0]].pos = new Point(2, 2);
     }
 }

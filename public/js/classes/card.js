@@ -12,6 +12,8 @@ export class Card extends Phaser.GameObjects.Container {
         }
         this.isOpen = true;
         this.setVisible(false);
+        this.setInteractive();
+        this.on('pointerdown', () => this.scene.onCardClick(this));
     }
 
     setOwner(owner) {
@@ -39,5 +41,13 @@ export class Card extends Phaser.GameObjects.Container {
 
     setTarget() {
         this.sprite.setTint(0xffff00);
+    }
+
+    setPos(pos) {
+        this.pos = pos;
+        const cell = this.scene.cells[pos.y][pos.x];
+        this.x = cell.x;
+        this.y = cell.y;
+        this.setVisible(true);
     }
 }
