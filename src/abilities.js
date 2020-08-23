@@ -10,4 +10,8 @@ exports.SimplePunch = class SimplePunch {
     isAvailable(card, battle) {
         return !card.isTurned && battle.currentPlayer == card.owner;
     }
+
+    isValid(card, target, battle) {
+        return this.isAvailable(card, battle) && this.targetIsValid(card, target);
+    }
 }

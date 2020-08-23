@@ -11,4 +11,15 @@ module.exports = class Card {
         }
         this.isTurned = false;
     }
+
+    completeAction(actionIndex, target, battle) {
+        if (this.abilities.length <= actionIndex)
+            return false;
+        const ability = this.abilities[actionIndex];
+        if (ability.isValid(this, target, battle)) {
+
+            return true;
+        }
+        return false;
+    }
 }

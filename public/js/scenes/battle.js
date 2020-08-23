@@ -100,6 +100,17 @@ export class BattleScene extends Phaser.Scene {
                     this.showPaws(card.pos.y, card.pos.x);
                 this.showCardActions(card);
             }
+        } else if (this.action == 'targetSelection') {
+            if (this.targets.indexOf(card.id) != -1) {
+                this.battleEmit({
+                    action: 'actionCard',
+                    cardID: this.selectdCard.id,
+                    actionIndex: this.actionIndex, targetID: card.id
+                });
+            }
+            this.action = null;
+            this.selectdCard = null;
+            this.clearTargets();
         }
     }
 
@@ -285,10 +296,6 @@ export class BattleScene extends Phaser.Scene {
         for (let row = 0; row < 6; row++) {
             for (let col = 0; col < 5; col++) {
                 this.cells[row][col].setVisible(true);
-                // const cardID = board[row][col];
-                // if (cardID) {
-                //     this.board[row][col].setCard(this.cards[cardID]);
-                // }
                 this.cells[row][col].on('pointerdown', () => this.cellPointerDown(row, col));
             }
         }
@@ -319,6 +326,7 @@ export class BattleScene extends Phaser.Scene {
                 this.targets = ability.targets(card, this.cards, this.cardsID);
                 this.targets.forEach((targetID, i, ar) => this.cards[targetID].setTarget(true));
                 this.action = 'targetSelection';
+                this.actionIndex = index;
             });
             this.cardActions.push(action);
         });
@@ -333,6 +341,10 @@ export class BattleScene extends Phaser.Scene {
         this.targets.forEach((targetID, i, arr) =>
             this.cards[targetID].setTarget(false));
         this.targets = [];
+    }
+
+    actionComplited(data) {
+
     }
 }
 

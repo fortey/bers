@@ -17,24 +17,17 @@ module.exports = class Battle {
         this.board = [];
         this.cards = [];
         this.enterCallbacks = [];
-
-        this.commands = [];
-        this.commands['selectDeck'] = this.startDrawing.bind(this);
-        this.commands['completeDrawing'] = this.completeDrawing.bind(this);
-        this.commands['moveCard'] = this.moveCard.bind(this);
     }
 
     messageOn(message, playerID) {
-        const command = this.commands[message.action];
-        if (command) {
-            command(message, playerID);
+        if (this[message.action]) {
+            this[message.action](message, playerID);
         }
     }
 
     addPlayer(playerID, playerPostman) {
         this.players.push(playerID);
         this.postmans[playerID] = playerPostman;
-        this.currentPlayer = playerID;
         if (this.players.length == 1) this.start();// later 2
     }
 
@@ -44,7 +37,11 @@ module.exports = class Battle {
         this.enterCallbacks.forEach(callback => callback({ id: this.id, decks: testDecks, endTime: this.startTime + this.selectDeckTime * 1000 }));
     }
 
-    startDrawing({ deckID }, playerID) {
+    selectDeck({ deckID }, playerID) {
+        this.startDrawing(deckID, playerID);
+    }
+
+    startDrawing(deckID, playerID) {
         this.setFirstPlayer();
         const deck = testDecks.find(el => el.id == deckID);
         this.decks[playerID] = this.initDeck(deck.cards, playerID);
@@ -108,6 +105,7 @@ module.exports = class Battle {
             }
 
             this.addTestPlayer();
+            this.currentPlayer = playerID;
             this.state = 'startBattle';
             const cards = this.cardsID.map((cardID, ind, arr) => ({ id: cardID, key: this.cards[cardID].key, owner: this.cards[cardID].owner, pos: this.cards[cardID].pos }));
             this.postmans[playerID]({ action: 'startBattle', board: this.board, cards: cards });
@@ -126,7 +124,10 @@ module.exports = class Battle {
         if (pos && this.cardInPosition(row, col) === undefined && (Math.abs(pos.x - col) == 1 && pos.y == row || Math.abs(pos.y - row) == 1 && pos.x == col)) {
             cardOb.pos = new Point(col, row);
             cardOb.paws--;
-            this.players.forEach(player => this.postmans[player]({ action: 'moveCardComplete', cardID: card, pos: cardOb.pos }));
+            this.players.forEach(player => this.postmans[player]({
+                action: 'moveCardComplete',
+                cardID: card, pos: cardOb.pos
+            }));
         }
     }
 
@@ -141,5 +142,15 @@ module.exports = class Battle {
         this.decks[playerID] = this.initDeck(deck.cards, playerID);
         this.board.push(this.decks[playerID][0]);
         this.cards[this.decks[playerID][0]].pos = new Point(2, 2);
+    }
+
+    actionCard({ cardID, actionIndex, targetID }, playerID) {
+        const card = this.cards[cardID];
+        const target = this.cards[targetID];
+        if (card && target) {
+            if (card.completeAction(actionIndex, target, this)) {
+                this.postmans[playerID]({ action: 'actionComplited' });
+            }
+        }
     }
 }
