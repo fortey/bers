@@ -34,6 +34,7 @@ module.exports = class Battle {
     addPlayer(playerID, playerPostman) {
         this.players.push(playerID);
         this.postmans[playerID] = playerPostman;
+        this.currentPlayer = playerID;
         if (this.players.length == 1) this.start();// later 2
     }
 
@@ -98,7 +99,7 @@ module.exports = class Battle {
                             //this.board[row + 3][col] = halfOfBoard[row][col];
                             this.cards[cardID].pos = new Point(col, row + 3);
                         } else {
-                            //this.board[2 - 1 * row][4 - 1 * col] = halfOfBoard[row][col]; // переворачивается поле 2го игрока
+                            // переворачивается поле 2го игрока
                             this.cards[cardID].pos = new Point(4 - 1 * col, 2 - 1 * row);
                         }
                         this.board.push(cardID);
@@ -106,12 +107,6 @@ module.exports = class Battle {
                 }
             }
 
-            // for (let row = 0; row < 6; row++) {
-            //     for (let col = 0; col < 5; col++) {
-            //         if (this.board[row][col])
-            //             this.cards[this.board[row][col]].pos = new Point(col, row);
-            //     }
-            // }
             this.addTestPlayer();
             this.state = 'startBattle';
             const cards = this.cardsID.map((cardID, ind, arr) => ({ id: cardID, key: this.cards[cardID].key, owner: this.cards[cardID].owner, pos: this.cards[cardID].pos }));
@@ -131,21 +126,13 @@ module.exports = class Battle {
         if (pos && this.cardInPosition(row, col) === undefined && (Math.abs(pos.x - col) == 1 && pos.y == row || Math.abs(pos.y - row) == 1 && pos.x == col)) {
             cardOb.pos = new Point(col, row);
             cardOb.paws--;
-            this.players.forEach(player => this.postmans[player]({ action: 'moveCardComplete', cardID: card, pos: cardOb.pos, oldPos: pos }));
+            this.players.forEach(player => this.postmans[player]({ action: 'moveCardComplete', cardID: card, pos: cardOb.pos }));
         }
     }
 
     cardInPosition(row, col) {
         return this.board.find((card, ind, arr) => this.cards[card].pos.x == col && this.cards[card].pos.y == row);
     }
-    // cardPosition(cardID) {
-    //     for (let row = 0; row < 6; row++) {
-    //         for (let col = 0; col < 5; col++) {
-    //             if (this.board[row][col] == cardID)
-    //                 return { y: row, x: col };
-    //         }
-    //     }
-    // }
 
     addTestPlayer() {
         const playerID = 'test';

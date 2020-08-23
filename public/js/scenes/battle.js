@@ -21,15 +21,13 @@ export class BattleScene extends Phaser.Scene {
         // this.boardData = data.board;
         // this.cardsData = data.cards;
         this.cards = [];
+        this.cardsID = [];
         // this.playerIndex = this.players.indexOf(data.playerID);
         // this.action = null;
         this.decks = decks;
         this.paws = [];
         this.firstTurn = true;
-        this.commands = [];
-        this.commands['startDrawing'] = this.startDrawing.bind(this);
-        this.commands['startBattle'] = this.startBattle.bind(this);
-        this.commands['moveCardComplete'] = this.moveCardComplete.bind(this); console.log(cardStore['arb'].abilities);
+        this.targets = [];
     }
     preload() { }
 
@@ -53,6 +51,7 @@ export class BattleScene extends Phaser.Scene {
             if (cardData.pos)
                 card.setPos(cardData.pos);
             this.cards[cardData.id] = card;
+            this.cardsID.push(cardData.id);
         });
     }
 
@@ -81,6 +80,11 @@ export class BattleScene extends Phaser.Scene {
                 this.selectdCard = null;
             }
         }
+        if (this.action == 'targetSelection') {
+            this.action = null;
+            this.selectdCard = null;
+            this.clearTargets();
+        }
     }
 
     onCardClick(card) {
@@ -91,9 +95,11 @@ export class BattleScene extends Phaser.Scene {
             }
             this.action = 'selectCard';
             this.selectdCard = card;
-            if (this.selectdCard.canMove())
-                this.showPaws(card.pos.y, card.pos.x);
-            this.showCardActions(card);
+            if (this.state == 'battle') {
+                if (this.selectdCard.canMove())
+                    this.showPaws(card.pos.y, card.pos.x);
+                this.showCardActions(card);
+            }
         }
     }
 
@@ -145,11 +151,7 @@ export class BattleScene extends Phaser.Scene {
     battleOn(data) {
         console.log('battle on');
         console.log(data);
-
-        const command = this.commands[data.action];
-        if (command) {
-            command(data);
-        }
+        this[data.action](data);
     }
     battleEmit(data) {
         this.events.emit('battleEmit', data);
@@ -292,16 +294,15 @@ export class BattleScene extends Phaser.Scene {
         }
 
         this.initCards(cards);
+        this.state = 'battle';
     }
 
-    moveCardComplete({ cardID, pos, oldPos }) {
-        // this.cells[oldPos.y][oldPos.x].card = null;
-        // this.cells[row][col].setCard(this.cards[card]);
+    moveCardComplete({ cardID, pos }) {
         const card = this.cards[cardID];
         card.paws--;
         this.deletePaws();
         this.selectdCard = null;
-        card.setPos(pos);
+        card.moveTo(pos);
         this.onCardClick(card);
     }
 
@@ -311,7 +312,14 @@ export class BattleScene extends Phaser.Scene {
         card.abilities.forEach((ability, index, arr) => {
             let action = this.add.text(1200, 900 - 50 * index, ability.toString(), { color: 'white', fontStyle: 'bold', backgroundColor: 'grey' });
             action.setInteractive();
-            action.on('pointerdown', () => console.log(ability.toString()));
+            action.on('pointerdown', () => {
+                console.log(ability.toString());
+                this.clearTargets();
+                this.deletePaws();
+                this.targets = ability.targets(card, this.cards, this.cardsID);
+                this.targets.forEach((targetID, i, ar) => this.cards[targetID].setTarget(true));
+                this.action = 'targetSelection';
+            });
             this.cardActions.push(action);
         });
     }
@@ -319,6 +327,12 @@ export class BattleScene extends Phaser.Scene {
         if (this.cardActions) {
             this.cardActions.forEach((action, index, arr) => action.destroy());
         }
+    }
+
+    clearTargets() {
+        this.targets.forEach((targetID, i, arr) =>
+            this.cards[targetID].setTarget(false));
+        this.targets = [];
     }
 }
 

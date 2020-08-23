@@ -2,6 +2,7 @@ export class Card extends Phaser.GameObjects.Container {
     constructor(scene, cardData) {
         super(scene, 0, 0);
         scene.add.existing(this);
+        scene.physics.world.enableBody(this);
         this.height = 152;
         this.width = 152;
 
@@ -39,8 +40,11 @@ export class Card extends Phaser.GameObjects.Container {
         return this.isOpen && this.paws > 0 && this.scene.playerID == this.owner;
     }
 
-    setTarget() {
-        this.sprite.setTint(0xffff00);
+    setTarget(isTarget) {
+        if (isTarget)
+            this.sprite.setTint(0xffff00);
+        else
+            this.sprite.clearTint();
     }
 
     setPos(pos) {
@@ -49,5 +53,11 @@ export class Card extends Phaser.GameObjects.Container {
         this.x = cell.x;
         this.y = cell.y;
         this.setVisible(true);
+    }
+    moveTo(pos) {
+        this.pos = pos;
+        const cell = this.scene.cells[pos.y][pos.x];
+        this.scene.physics.moveToObject(this, cell, 60, 500);
+        setTimeout(() => this.body.reset(cell.x, cell.y), 480);
     }
 }

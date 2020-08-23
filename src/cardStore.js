@@ -1,90 +1,114 @@
+const { SimplePunch } = require('./abilities.js');
+
 module.exports = {
     'arb': {
         key: 'arb', name: 'Арбалетчик', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 0
+        type: 'gold', health: 8, paws: 1, frame: 0,
+        abilities: [new SimplePunch([1, 2, 3])]
     },
     'garrid': {
-        key: 'garrid', name: 'Гаррид-лучник', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 1
+        key: 'garrid', name: 'Гаррид-Лучник', cost: 6,
+        type: 'gold', health: 8, paws: 2, frame: 1,
+        abilities: [new SimplePunch([2, 3, 4])]
     },
     'hedd': {
-        key: 'hedd', name: 'hedd', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 2
+        key: 'hedd', name: 'Хедд', cost: 6,
+        type: 'gold', health: 8, paws: 2, frame: 2,
+        abilities: [new SimplePunch([2, 2, 3])]
     },
     'ijor': {
-        key: 'ijor', name: 'ijor', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 3
+        key: 'ijor', name: 'Ижор', cost: 6,
+        type: 'gold', health: 8, paws: 2, frame: 3,
+        abilities: [new SimplePunch([1, 2, 3])]
     },
     'morok': {
-        key: 'morok', name: 'morok', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 4
+        key: 'morok', name: 'Морок', cost: 6,
+        type: 'gold', health: 8, paws: 2, frame: 4,
+        abilities: [new SimplePunch([2, 2, 3])]
     },
     'gorgon': {
-        key: 'gorgon', name: 'gorgon', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 5
+        key: 'gorgon', name: 'Песчаный Горгон', cost: 6,
+        type: 'gold', health: 8, paws: 2, frame: 5,
+        abilities: [new SimplePunch([2, 2, 3])]
     },
     'kshar': {
-        key: 'kshar', name: 'kshar', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 6
+        key: 'kshar', name: 'Кшар', cost: 6,
+        type: 'gold', health: 8, paws: 2, frame: 6,
+        abilities: [new SimplePunch([1, 2, 2])]
     },
     'mant': {
-        key: 'mant', name: 'mant', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 7
+        key: 'mant', name: 'Мантикора', cost: 6,
+        type: 'gold', health: 8, paws: 2, frame: 7,
+        abilities: [new SimplePunch([2, 2, 3])]
     },
     'ogr': {
-        key: 'ogr', name: 'ogr', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 8
+        key: 'ogr', name: 'Древний Огр', cost: 6,
+        type: 'gold', health: 8, paws: 2, frame: 8,
+        abilities: [new SimplePunch([3, 4, 5])]
     },
     'ork': {
-        key: 'ork', name: 'ork', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 9
+        key: 'ork', name: 'Орк', cost: 6,
+        type: 'gold', health: 8, paws: 2, frame: 9,
+        abilities: [new SimplePunch([3, 3, 4])]
     },
     'osklizg': {
-        key: 'osklizg', name: 'osklizg', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 10
+        key: 'osklizg', name: 'Осклизг', cost: 6,
+        type: 'gold', health: 8, paws: 2, frame: 10,
+        abilities: [new SimplePunch([1, 2, 3])]
     },
     'ost': {
-        key: 'ost', name: 'ost', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 11
+        key: 'ost', name: 'Ост', cost: 6,
+        type: 'gold', health: 8, paws: 2, frame: 11,
+        abilities: [new SimplePunch([1, 2, 2])]
     },
     'otsheln': {
-        key: 'otsheln', name: 'otsheln', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 12
+        key: 'otsheln', name: 'Отшельник', cost: 6,
+        type: 'gold', health: 8, paws: 2, frame: 12,
+        abilities: [new SimplePunch([1, 1, 2])]
     },
     'shaman': {
-        key: 'shaman', name: 'shaman', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 13
+        key: 'shaman', name: 'Шаман-Душегрыз', cost: 6,
+        type: 'gold', health: 8, paws: 2, frame: 13,
+        abilities: [new SimplePunch([1, 1, 2])]
     },
     'shield': {
-        key: 'shield', name: 'shield', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 14
+        key: 'shield', name: 'Щитоносец', cost: 6,
+        type: 'gold', health: 8, paws: 2, frame: 14,
+        abilities: [new SimplePunch([1, 2, 2])]
     },
     'skelos': {
-        key: 'skelos', name: 'skelos', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 15
+        key: 'skelos', name: 'Скелос', cost: 6,
+        type: 'gold', health: 8, paws: 2, frame: 15,
+        abilities: [new SimplePunch([3, 4, 5])]
     },
     'troll': {
-        key: 'troll', name: 'troll', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 16
+        key: 'troll', name: 'Тролль', cost: 6,
+        type: 'gold', health: 8, paws: 2, frame: 16,
+        abilities: [new SimplePunch([2, 4, 5])]
     },
     'trollok': {
-        key: 'trollok', name: 'trollok', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 17
+        key: 'trollok', name: 'Троллок', cost: 6,
+        type: 'gold', health: 8, paws: 2, frame: 17,
+        abilities: [new SimplePunch([1, 2, 3])]
     },
     'vail': {
-        key: 'vail', name: 'vail', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 18
+        key: 'vail', name: 'Вайл', cost: 6,
+        type: 'silver', health: 14, paws: 1, frame: 18,
+        abilities: [new SimplePunch([1, 1, 4])]
     },
     'voin': {
-        key: 'voin', name: 'voin', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 19
+        key: 'voin', name: 'Воин Храма', cost: 8,
+        type: 'silver', health: 13, paws: 2, frame: 19,
+        abilities: [new SimplePunch([2, 4, 5])]
     },
     'volk': {
-        key: 'volk', name: 'volk', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 20
+        key: 'volk', name: 'Степной Волколак', cost: 6,
+        type: 'gold', health: 8, paws: 2, frame: 20,
+        abilities: [new SimplePunch([2, 2, 3])]
     },
     'zmee': {
-        key: 'zmee', name: 'zmee', cost: 6,
-        type: 'gold', health: 8, paws: 2, frame: 21
+        key: 'zmee', name: 'Змееглав', cost: 6,
+        type: 'gold', health: 8, paws: 2, frame: 21,
+        abilities: [new SimplePunch([2, 4, 5])]
     },
 };

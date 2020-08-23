@@ -9,5 +9,6 @@ module.exports = class Card {
         for (let key in cardData) {
             this[key] = cardData[key];
         }
+        this.isTurned = false;
     }
 }

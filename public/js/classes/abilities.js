@@ -12,7 +12,7 @@ export class SimplePunch {
     }
     targets(source, cards, cardsID) {
         return cardsID.filter((cardID, index, arr) => {
-            Math.abs(source.pos.x - cards[cardID].pos.x) < 2 && Math.abs(source.pos.y - cards[cardID].pos.y) < 2;
+            return cards[cardID].pos && cardID != source.id && Math.abs(source.pos.x - cards[cardID].pos.x) < 2 && Math.abs(source.pos.y - cards[cardID].pos.y) < 2;
         });
     }
 }
