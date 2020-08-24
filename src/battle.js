@@ -148,7 +148,9 @@ module.exports = class Battle {
         const card = this.cards[cardID];
         const target = this.cards[targetID];
         if (card && target) {
-            if (card.completeAction(actionIndex, target, this)) {
+            const result = card.completeAction(actionIndex, target, this);
+            if (result) {
+                console.log(result);
                 this.postmans[playerID]({ action: 'actionComplited' });
             }
         }
