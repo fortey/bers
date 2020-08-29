@@ -17,6 +17,7 @@ module.exports = class Battle {
         this.board = [];
         this.cards = [];
         this.enterCallbacks = [];
+        this.playersState = [];
     }
 
     messageOn(message, playerID) {
@@ -28,7 +29,7 @@ module.exports = class Battle {
     addPlayer(playerID, playerPostman) {
         this.players.push(playerID);
         this.postmans[playerID] = playerPostman;
-        if (this.players.length == 1) this.start();// later 2
+        if (this.players.length == 2) this.start();
     }
 
     start() {
@@ -87,6 +88,7 @@ module.exports = class Battle {
     completeDrawing({ halfOfBoard }, playerID) {
         if (this.state == 'drawing') {// todo: проверка расстановки
             console.log(`${this.firstPlayer} - ${playerID}`);
+            this.playersState[playerID] = 'completeDrawing';
 
             for (let row = 0; row < 3; row++) {
                 for (let col = 0; col < 5; col++) {
@@ -104,12 +106,36 @@ module.exports = class Battle {
                 }
             }
 
-            this.addTestPlayer();
-            this.currentPlayer = playerID;
-            this.state = 'startBattle';
-            const cards = this.cardsID.map((cardID, ind, arr) => ({ id: cardID, key: this.cards[cardID].key, owner: this.cards[cardID].owner, pos: this.cards[cardID].pos }));
+            //this.addTestPlayer();
+            if (this.playersState[this.players[0]] == 'completeDrawing'
+                && this.playersState[this.players[1]] == 'completeDrawing')
+                this.startBattle();
+        }
+    }
+
+    startBattle() {
+        this.currentPlayer = this.firstPlayer;
+        this.state = 'startBattle';
+        const cards = this.cardsID.map((cardID, ind, arr) => ({ id: cardID, key: this.cards[cardID].key, owner: this.cards[cardID].owner, pos: this.cards[cardID].pos }));
+        for (let playerID in this.postmans) {
             this.postmans[playerID]({ action: 'startBattle', board: this.board, cards: cards });
         }
+        this.startTurn();
+    }
+
+    startTurn() {
+        this.state = 'startTurn';
+        this.currentPlayer = this.players.find(playerID => playerID != this.currentPlayer);
+        // todo actions
+        this.inTurn()
+    }
+
+    inTurn() {
+        this.state = 'inTurn';
+        this.endTurn();
+    }
+    endTurn() {
+
     }
 
     setFirstPlayer() {
