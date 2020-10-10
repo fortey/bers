@@ -346,5 +346,9 @@ export class BattleScene extends Phaser.Scene {
     actionComplited(data) {
 
     }
+
+    battleIsOver({ isWin }) {
+
+    }
 }
 

@@ -18,6 +18,8 @@ module.exports = class Battle {
         this.cards = [];
         this.enterCallbacks = [];
         this.playersState = [];
+        this.endTime = null;
+        this.endTimeActionID = null;
     }
 
     messageOn(message, playerID) {
@@ -34,8 +36,9 @@ module.exports = class Battle {
 
     start() {
         this.startTime = Date.now();
-        this.selectDeckTime = 120;
-        this.enterCallbacks.forEach(callback => callback({ id: this.id, decks: testDecks, endTime: this.startTime + this.selectDeckTime * 1000 }));
+        this.endTime = Date.now() + 60000;
+        this.endTimeActionID = setTimeout(this.timeDrawingIsOver.bind(this), 60000);
+        this.enterCallbacks.forEach(callback => callback({ id: this.id, decks: testDecks, endTime: this.endTime }));
     }
 
     selectDeck({ deckID }, playerID) {
@@ -108,9 +111,17 @@ module.exports = class Battle {
 
             //this.addTestPlayer();
             if (this.playersState[this.players[0]] == 'completeDrawing'
-                && this.playersState[this.players[1]] == 'completeDrawing')
+                && this.playersState[this.players[1]] == 'completeDrawing') {
+                clearTimeout(this.endTimeActionID);
                 this.startBattle();
+            }
         }
+    }
+
+    timeDrawingIsOver() {
+        this.players.forEach(playerID => {
+            this.postmans[playerID]({ action: 'battleIsOver', isWin: this.playersState[playerID] == 'completeDrawing' });
+        });
     }
 
     startBattle() {
