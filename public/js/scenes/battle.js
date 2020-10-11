@@ -28,6 +28,7 @@ export class BattleScene extends Phaser.Scene {
         this.paws = [];
         this.firstTurn = true;
         this.targets = [];
+        this.isMyTurn = false;
     }
     preload() { }
 
@@ -88,6 +89,8 @@ export class BattleScene extends Phaser.Scene {
     }
 
     onCardClick(card) {
+        if (!this.isMyTurn) return;
+
         if (!this.action || this.action == 'selectCard') {
             if (this.selectdCard) {
                 if (this.selectdCard == card) return;
@@ -347,6 +350,10 @@ export class BattleScene extends Phaser.Scene {
 
     }
 
+    startTurn({ currentPlayer, endTime }) {
+        this.endTime = endTime;
+        this.isMyTurn = this.playerID == currentPlayer;
+    }
     battleIsOver({ isWin }) {
 
     }

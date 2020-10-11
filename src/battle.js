@@ -20,6 +20,7 @@ module.exports = class Battle {
         this.playersState = [];
         this.endTime = null;
         this.endTimeActionID = null;
+        this.isOver = false;
     }
 
     messageOn(message, playerID) {
@@ -119,6 +120,7 @@ module.exports = class Battle {
     }
 
     timeDrawingIsOver() {
+        this.isOver = true;
         this.players.forEach(playerID => {
             this.postmans[playerID]({ action: 'battleIsOver', isWin: this.playersState[playerID] == 'completeDrawing' });
         });
@@ -135,9 +137,13 @@ module.exports = class Battle {
     }
 
     startTurn() {
+        if (this.isOver) return;
         this.state = 'startTurn';
         this.currentPlayer = this.players.find(playerID => playerID != this.currentPlayer);
         // todo actions
+        this.endTime = Date.now() + 60000;
+        this.endTimeActionID = setTimeout(this.startTurn.bind(this), 60000);
+        this.sendMessage({ action: 'startTurn', currentPlayer: this.currentPlayer, endTime: this.endTime });
         this.inTurn()
     }
 
@@ -152,6 +158,12 @@ module.exports = class Battle {
     setFirstPlayer() {
         if (!this.firstPlayer)
             this.firstPlayer = this.players[0];
+    }
+
+    sendMessage(message) {
+        for (let playerID in this.postmans) {
+            this.postmans[playerID](message);
+        }
     }
 
     moveCard({ card, row, col }, playerID) {
